@@ -34,7 +34,6 @@ MODEL_TYPE_TO_TOKENIZER = {
     "bart": BartTokenizer,
 }
 
-output_dir = 't5-small-qg-hl'
 model_type = 't5'
 model_name = 't5-small'
 tokenizer_name = 't5_qg_tokenizer'
@@ -157,6 +156,11 @@ def main():
 
     training_args = parser.parse_args_into_dataclasses()
 
+    if os.path.exists(training_args.output_dir) and not training_args.overwrite_output_dir:
+        raise ValueError(
+            f"Directory exists. Add --overwrite_output_dir."
+        )
+
     set_seed(training_args.seed)
 
     os.environ["WANDB_PROJECT"] = "question-generation"
@@ -171,8 +175,8 @@ def main():
 
     model.resize_token_embeddings(len(tokenizer))
     
-    train_dataset = torch.load(trainset_path)
-    valid_dataset = torch.load(validset_path)
+    train_dataset = torch.load(data_args.train_file_path) if training_args.do_train else None
+    valid_dataset = torch.load(data_args.valid_file_path) if training_args.do_eval else None
     
     # Initialize data_collator
     data_collator = T2TDataCollator(
@@ -193,27 +197,26 @@ def main():
     )
 
     # Training
-    trainer.train(
-        model_path=model_name
-    )
+    if training_args.do_train:
+        trainer.train(
+            model_path=model_name
+        )
 
-    trainer.save_model()
-    
-    if trainer.is_world_master():
-        tokenizer.save_pretrained(output_dir)
+        trainer.save_model()
+        
+        if trainer.is_world_master():
+            tokenizer.save_pretrained(training_args.output_dir)
 
     # Evaluation
     results = {}
+    if training_args.do_eval:
+        eval_output = trainer.evaluate()
+        output_eval_file = os.path.join(training_args.output_dir, "eval_results.txt")
+        with open(output_eval_file, "w") as writer:
+            for key in sorted(eval_output.keys()):
+                writer.write("%s = %s\n" % (key, str(eval_output[key])))
 
-    eval_output = trainer.evaluate()
-
-    output_eval_file = os.path.join(output_dir, "eval_results.txt")
-    with open(output_eval_file, "w") as writer:
-        logger.info("***** Eval results *****")
-        for key in sorted(eval_output.keys()):
-            writer.write("%s = %s\n" % (key, str(eval_output[key])))
-
-    results.update(eval_output)
+        results.update(eval_output)
     
     return results
 
