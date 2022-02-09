@@ -147,7 +147,6 @@ def pipeline(
     tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     ans_model: Optional = None,
     ans_tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None
-    **kwargs,
 ):
     # Use default model/config/tokenizer for the task if no model is provided
     if model is None:
