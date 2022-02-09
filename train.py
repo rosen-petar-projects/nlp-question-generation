@@ -167,8 +167,8 @@ def main():
 
     model.resize_token_embeddings(len(tokenizer))
     
-    train_dataset = torch.load(train_file_path)
-    valid_dataset = torch.load(valid_file_path)
+    train_dataset = torch.load(trainset_path)
+    valid_dataset = torch.load(validset_path)
     
     # Initialize data_collator
     data_collator = T2TDataCollator(
