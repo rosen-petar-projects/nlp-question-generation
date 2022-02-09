@@ -18,8 +18,8 @@ from transformers import (
     HfArgumentParser,
     DataCollator,
     TrainingArguments,
-    Trainer as HFTrainer
-    set_seed,
+    Trainer as HFTrainer,
+    set_seed
 )
 
 from transformers.file_utils import is_apex_available
