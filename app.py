@@ -144,7 +144,7 @@ class QGPipeline:
 
 def pipeline(
     model: Optional = None,
-    tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None
+    tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     ans_model: Optional = None,
     ans_tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None
     **kwargs,
