@@ -5,6 +5,8 @@ from typing import Dict, List, Optional
 import nlp
 from transformers import T5Tokenizer, BartTokenizer, HfArgumentParser
 
+import torch
+
 model_type = 't5'
 dataset_path = 'data/squad_multitask/'
 train_file_name = 'train_data_qg_hl_t5.pt'
