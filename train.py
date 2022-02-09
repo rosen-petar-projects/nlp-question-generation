@@ -36,7 +36,7 @@ MODEL_TYPE_TO_TOKENIZER = {
 
 output_dir = 't5-small-qg-hl'
 model_type = 't5'
-model_name = 't5-small-qg-hl'
+model_name = 't5-small'
 tokenizer_name = 't5_qg_tokenizer'
 cache_dir = ''
 trainset_path = 'data/train_data_qg_hl_t5.pt'
@@ -193,7 +193,7 @@ def main():
 
     # Training
     trainer.train(
-        model_path=model
+        model_path=model_name
     )
 
     trainer.save_model()
