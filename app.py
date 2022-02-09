@@ -46,7 +46,7 @@ class QGPipeline:
         if len(flat_answers) == 0:
           return []
 
-        qg_examples = self.prepare_inputs_for_qg_from_answers_hl(inputs, answers)
+        qg_examples = self.prepare_inputs_for_qg_from_answers_hl(sents, answers)
         
         qg_inputs = [example['source_text'] for example in qg_examples]
         questions = self.generate_questions(qg_inputs)
