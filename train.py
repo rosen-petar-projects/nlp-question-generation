@@ -38,7 +38,6 @@ output_dir = 't5-small-qg-hl'
 model_type = 't5'
 model_name = 't5-small'
 tokenizer_name = 't5_qg_tokenizer'
-cache_dir = ''
 trainset_path = 'data/train_data_qg_hl_t5.pt'
 validset_path = 'data/valid_data_qg_hl_t5.pt'
 
@@ -160,12 +159,10 @@ def main():
 
     tokenizer_cls = MODEL_TYPE_TO_TOKENIZER[model_type]
     tokenizer = tokenizer_cls.from_pretrained(
-        tokenizer_name if tokenizer_name else model_name,
-        cache_dir=cache_dir,
+        tokenizer_name if tokenizer_name else model_name
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
-        model_name,
-        cache_dir=cache_dir,
+        model_name
     )
 
     model.resize_token_embeddings(len(tokenizer))
