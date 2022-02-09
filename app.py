@@ -40,21 +40,21 @@ class QGPipeline:
 
     def __call__(self, inputs: str):
         inputs = " ".join(inputs.split())
-        sents, answers = self._extract_answers(inputs)
+        sents, answers = self.extract_answers(inputs)
         flat_answers = list(itertools.chain(*answers))
         
         if len(flat_answers) == 0:
           return []
 
-        qg_examples = self._prepare_inputs_for_qg_from_answers_prepend(inputs, answers)
+        qg_examples = self.prepare_inputs_for_qg_from_answers_hl(inputs, answers)
         
         qg_inputs = [example['source_text'] for example in qg_examples]
-        questions = self._generate_questions(qg_inputs)
+        questions = self.generate_questions(qg_inputs)
         output = [{'answer': example['answer'], 'question': que} for example, que in zip(qg_examples, questions)]
         return output
     
-    def _generate_questions(self, inputs):
-        inputs = self._tokenize(inputs, padding=True, truncation=True)
+    def generate_questions(self, inputs):
+        inputs = self.tokenize(inputs, padding=True, truncation=True)
         
         outs = self.model.generate(
             input_ids=inputs['input_ids'].to(self.device), 
@@ -66,9 +66,9 @@ class QGPipeline:
         questions = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in outs]
         return questions
     
-    def _extract_answers(self, context):
-        sents, inputs = self._prepare_inputs_for_ans_extraction(context)
-        inputs = self._tokenize(inputs, padding=True, truncation=True)
+    def extract_answers(self, context):
+        sents, inputs = self.prepare_inputs_for_ans_extraction(context)
+        inputs = self.tokenize(inputs, padding=True, truncation=True)
 
         outs = self.ans_model.generate(
             input_ids=inputs['input_ids'].to(self.device), 
@@ -82,7 +82,7 @@ class QGPipeline:
         
         return sents, answers
     
-    def _tokenize(self,
+    def tokenize(self,
         inputs,
         padding=True,
         truncation=True,
@@ -100,7 +100,7 @@ class QGPipeline:
         )
         return inputs
     
-    def _prepare_inputs_for_ans_extraction(self, text):
+    def prepare_inputs_for_ans_extraction(self, text):
         sents = sent_tokenize(text)
 
         inputs = []
@@ -118,7 +118,7 @@ class QGPipeline:
 
         return sents, inputs
     
-    def _prepare_inputs_for_qg_from_answers_hl(self, sents, answers):
+    def prepare_inputs_for_qg_from_answers_hl(self, sents, answers):
         inputs = []
         for i, answer in enumerate(answers):
             if len(answer) == 0: continue
