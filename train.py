@@ -24,7 +24,7 @@ from transformers import (
 
 from transformers.file_utils import is_apex_available
 
-from utils import freeze_embeds, assert_not_all_frozen
+from utils import freeze_embeds, assert_not_all_frozen, label_smoothed_nll_loss
 
 if is_apex_available():
     from apex import amp
@@ -135,7 +135,7 @@ class Trainer(HFTrainer):
         outputs = model(**inputs)
         lprobs = torch.nn.functional.log_softmax(outputs[0], dim=-1)
         loss, nll_loss = label_smoothed_nll_loss(
-            lprobs, labels, self.label_smoothing, ignore_index=model.config.pad_token_id
+            lprobs, labels, 0, ignore_index=model.config.pad_token_id
         )
 
         if self.args.n_gpu > 1:
