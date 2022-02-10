@@ -152,7 +152,7 @@ class Trainer(HFTrainer):
         return loss.item()
 
 def main():
-    parser = HfArgumentParser((TrainingArguments))
+    parser = HfArgumentParser(TrainingArguments)
 
     training_args = parser.parse_args_into_dataclasses()
 
