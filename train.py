@@ -154,7 +154,7 @@ class Trainer(HFTrainer):
 def main():
     parser = HfArgumentParser(TrainingArguments)
 
-    training_args = parser.parse_args_into_dataclasses()
+    training_args = parser.parse_args_into_dataclasses()[0]
 
     if os.path.exists(training_args.output_dir) and not training_args.overwrite_output_dir:
         raise ValueError(
@@ -175,8 +175,8 @@ def main():
 
     model.resize_token_embeddings(len(tokenizer))
     
-    train_dataset = torch.load(data_args.train_file_path) if training_args.do_train else None
-    valid_dataset = torch.load(data_args.valid_file_path) if training_args.do_eval else None
+    train_dataset = torch.load(trainset_path) if training_args.do_train else None
+    valid_dataset = torch.load(validset_path) if training_args.do_eval else None
     
     # Initialize data_collator
     data_collator = T2TDataCollator(
