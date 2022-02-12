@@ -1,4 +1,5 @@
 transformers==3.0.0
-nltk
 nlp==0.2.0
+sense2vec==1.0.2
 torch
+nltk

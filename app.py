@@ -2,7 +2,7 @@ import itertools
 from typing import Optional, Dict, Union
 
 from nltk import sent_tokenize
-
+import random
 import torch
 from transformers import(
     AutoModelForSeq2SeqLM, 
@@ -10,6 +10,25 @@ from transformers import(
     PreTrainedModel,
     PreTrainedTokenizer,
 )
+from collections import OrderedDict
+from sense2vec import Sense2Vec
+s2v = Sense2Vec().from_disk('sense2vec/s2v_old')
+
+def sense2vec_get_words(word,s2v):
+    output = []
+    word = word.lower()
+    word = word.replace(" ", "_")
+
+    sense = s2v.get_best_sense(word)
+    most_similar = s2v.most_similar(sense, n=20)
+
+    for each_word in most_similar:
+        append_word = each_word[0].split("|")[0].replace("_", " ").lower()
+        if append_word.lower() != word:
+            output.append(append_word.title())
+
+    out = list(OrderedDict.fromkeys(output))
+    return out
 
 class QGPipeline:
     def __init__(
@@ -50,7 +69,7 @@ class QGPipeline:
         
         qg_inputs = [example['source_text'] for example in qg_examples]
         questions = self.generate_questions(qg_inputs)
-        output = [{'answer': example['answer'], 'question': que} for example, que in zip(qg_examples, questions)]
+        output = [{'answer': example['answer'], 'question': que, 'distractors': random.choices(sense2vec_get_words(example['answer'],s2v), k=3)} for example, que in zip(qg_examples, questions)]
         return output
     
     def generate_questions(self, inputs):
